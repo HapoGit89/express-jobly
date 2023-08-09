@@ -49,7 +49,103 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll() {
+  static async findAll(name, minEmployees, maxEmployees) {
+    if(name && !minEmployees && !maxEmployees){
+      const companiesRes = await db.query(
+        `SELECT handle,
+                name,
+                description,
+                num_employees AS "numEmployees",
+                logo_url AS "logoUrl"
+         FROM companies
+         WHERE lower (handle) LIKE $1
+         ORDER BY name`, [`%${name.toLowerCase()}%`] );
+  return companiesRes.rows;
+    }
+
+    if(name && minEmployees && !maxEmployees){
+      const companiesRes = await db.query(
+        `SELECT handle,
+                name,
+                description,
+                num_employees AS "numEmployees",
+                logo_url AS "logoUrl"
+         FROM companies
+         WHERE lower (handle) LIKE $1
+         AND num_employees > $2
+         ORDER BY name`, [`%${name.toLowerCase()}%`, minEmployees] );
+  return companiesRes.rows;
+    }
+
+    if(name && minEmployees && maxEmployees){
+      const companiesRes = await db.query(
+        `SELECT handle,
+                name,
+                description,
+                num_employees AS "numEmployees",
+                logo_url AS "logoUrl"
+         FROM companies
+         WHERE lower (handle) LIKE $1
+         AND num_employees > $2
+         AND num_employees < $3
+         ORDER BY name`, [`%${name.toLowerCase()}%`, minEmployees, maxEmployees] );
+  return companiesRes.rows;
+    }
+
+    if(name && !minEmployees && maxEmployees){
+      const companiesRes = await db.query(
+        `SELECT handle,
+                name,
+                description,
+                num_employees AS "numEmployees",
+                logo_url AS "logoUrl"
+         FROM companies
+         WHERE lower (handle) LIKE $1
+         AND num_employees < $2
+         ORDER BY name`, [`%${name.toLowerCase()}%`, maxEmployees] );
+  return companiesRes.rows;
+    } 
+
+  if(!name && minEmployees && maxEmployees){
+      const companiesRes = await db.query(
+        `SELECT handle,
+                name,
+                description,
+                num_employees AS "numEmployees",
+                logo_url AS "logoUrl"
+         FROM companies
+         WHERE num_employees > $1
+         AND num_employees < $2
+         ORDER BY name`, [minEmployees, maxEmployees] );
+  return companiesRes.rows;
+    }
+
+    if(!name && !minEmployees && maxEmployees){
+      const companiesRes = await db.query(
+        `SELECT handle,
+                name,
+                description,
+                num_employees AS "numEmployees",
+                logo_url AS "logoUrl"
+         FROM companies
+         WHERE num_employees < $1
+         ORDER BY name`, [maxEmployees] );
+  return companiesRes.rows;
+    }
+
+    if(!name && minEmployees && !maxEmployees){
+      const companiesRes = await db.query(
+        `SELECT handle,
+                name,
+                description,
+                num_employees AS "numEmployees",
+                logo_url AS "logoUrl"
+         FROM companies
+         WHERE num_employees > $1
+         ORDER BY name`, [minEmployees] );
+  return companiesRes.rows;
+    }
+
     const companiesRes = await db.query(
           `SELECT handle,
                   name,
