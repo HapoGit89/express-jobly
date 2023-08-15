@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate } = require("../helpers/sql");
+const { sqlForPartialUpdate, sqlFilters } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -50,110 +50,11 @@ class Company {
    * */
 
   static async findAll(name, minEmployees, maxEmployees) {
-    if(name && !minEmployees && !maxEmployees){
-      const companiesRes = await db.query(
-        `SELECT handle,
-                name,
-                description,
-                num_employees AS "numEmployees",
-                logo_url AS "logoUrl"
-         FROM companies
-         WHERE lower (handle) LIKE $1
-         ORDER BY name`, [`%${name.toLowerCase()}%`] );
-  return companiesRes.rows;
-    }
-
-    if(name && minEmployees && !maxEmployees){
-      const companiesRes = await db.query(
-        `SELECT handle,
-                name,
-                description,
-                num_employees AS "numEmployees",
-                logo_url AS "logoUrl"
-         FROM companies
-         WHERE lower (handle) LIKE $1
-         AND num_employees > $2
-         ORDER BY name`, [`%${name.toLowerCase()}%`, minEmployees] );
-  return companiesRes.rows;
-    }
-
-    if(name && minEmployees && maxEmployees){
-      const companiesRes = await db.query(
-        `SELECT handle,
-                name,
-                description,
-                num_employees AS "numEmployees",
-                logo_url AS "logoUrl"
-         FROM companies
-         WHERE lower (handle) LIKE $1
-         AND num_employees > $2
-         AND num_employees < $3
-         ORDER BY name`, [`%${name.toLowerCase()}%`, minEmployees, maxEmployees] );
-  return companiesRes.rows;
-    }
-
-    if(name && !minEmployees && maxEmployees){
-      const companiesRes = await db.query(
-        `SELECT handle,
-                name,
-                description,
-                num_employees AS "numEmployees",
-                logo_url AS "logoUrl"
-         FROM companies
-         WHERE lower (handle) LIKE $1
-         AND num_employees < $2
-         ORDER BY name`, [`%${name.toLowerCase()}%`, maxEmployees] );
-  return companiesRes.rows;
-    } 
-
-  if(!name && minEmployees && maxEmployees){
-      const companiesRes = await db.query(
-        `SELECT handle,
-                name,
-                description,
-                num_employees AS "numEmployees",
-                logo_url AS "logoUrl"
-         FROM companies
-         WHERE num_employees > $1
-         AND num_employees < $2
-         ORDER BY name`, [minEmployees, maxEmployees] );
-  return companiesRes.rows;
-    }
-
-    if(!name && !minEmployees && maxEmployees){
-      const companiesRes = await db.query(
-        `SELECT handle,
-                name,
-                description,
-                num_employees AS "numEmployees",
-                logo_url AS "logoUrl"
-         FROM companies
-         WHERE num_employees < $1
-         ORDER BY name`, [maxEmployees] );
-  return companiesRes.rows;
-    }
-
-    if(!name && minEmployees && !maxEmployees){
-      const companiesRes = await db.query(
-        `SELECT handle,
-                name,
-                description,
-                num_employees AS "numEmployees",
-                logo_url AS "logoUrl"
-         FROM companies
-         WHERE num_employees > $1
-         ORDER BY name`, [minEmployees] );
-  return companiesRes.rows;
-    }
-
+    const {baseQuery, variables} = sqlFilters(name, minEmployees, maxEmployees)
+  
     const companiesRes = await db.query(
-          `SELECT handle,
-                  name,
-                  description,
-                  num_employees AS "numEmployees",
-                  logo_url AS "logoUrl"
-           FROM companies
-           ORDER BY name`);
+      baseQuery, variables
+          );
     return companiesRes.rows;
   }
 
@@ -240,3 +141,104 @@ class Company {
 
 
 module.exports = Company;
+
+
+
+
+
+// More code heavy way of filtering for findAll()
+//   if(name && !minEmployees && !maxEmployees){
+  //     const companiesRes = await db.query(
+  //       `SELECT handle,
+  //               name,
+  //               description,
+  //               num_employees AS "numEmployees",
+  //               logo_url AS "logoUrl"
+  //        FROM companies
+  //        WHERE lower (handle) LIKE $1
+  //        ORDER BY name`, [`%${name.toLowerCase()}%`] );
+  // return companiesRes.rows;
+  //   }
+
+  //   if(name && minEmployees && !maxEmployees){
+  //     const companiesRes = await db.query(
+  //       `SELECT handle,
+  //               name,
+  //               description,
+  //               num_employees AS "numEmployees",
+  //               logo_url AS "logoUrl"
+  //        FROM companies
+  //        WHERE lower (handle) LIKE $1
+  //        AND num_employees > $2
+  //        ORDER BY name`, [`%${name.toLowerCase()}%`, minEmployees] );
+  // return companiesRes.rows;
+  //   }
+
+  //   if(name && minEmployees && maxEmployees){
+  //     const companiesRes = await db.query(
+  //       `SELECT handle,
+  //               name,
+  //               description,
+  //               num_employees AS "numEmployees",
+  //               logo_url AS "logoUrl"
+  //        FROM companies
+  //        WHERE lower (handle) LIKE $1
+  //        AND num_employees > $2
+  //        AND num_employees < $3
+  //        ORDER BY name`, [`%${name.toLowerCase()}%`, minEmployees, maxEmployees] );
+  // return companiesRes.rows;
+  //   }
+
+  //   if(name && !minEmployees && maxEmployees){
+  //     const companiesRes = await db.query(
+  //       `SELECT handle,
+  //               name,
+  //               description,
+  //               num_employees AS "numEmployees",
+  //               logo_url AS "logoUrl"
+  //        FROM companies
+  //        WHERE lower (handle) LIKE $1
+  //        AND num_employees < $2
+  //        ORDER BY name`, [`%${name.toLowerCase()}%`, maxEmployees] );
+  // return companiesRes.rows;
+  //   } 
+
+  // if(!name && minEmployees && maxEmployees){
+  //     const companiesRes = await db.query(
+  //       `SELECT handle,
+  //               name,
+  //               description,
+  //               num_employees AS "numEmployees",
+  //               logo_url AS "logoUrl"
+  //        FROM companies
+  //        WHERE num_employees > $1
+  //        AND num_employees < $2
+  //        ORDER BY name`, [minEmployees, maxEmployees] );
+  // return companiesRes.rows;
+  //   }
+
+  //   if(!name && !minEmployees && maxEmployees){
+  //     const companiesRes = await db.query(
+  //       `SELECT handle,
+  //               name,
+  //               description,
+  //               num_employees AS "numEmployees",
+  //               logo_url AS "logoUrl"
+  //        FROM companies
+  //        WHERE num_employees < $1
+  //        ORDER BY name`, [maxEmployees] );
+  // return companiesRes.rows;
+  //   }
+
+  //   if(!name && minEmployees && !maxEmployees){
+  //     const companiesRes = await db.query(
+  //       `SELECT handle,
+  //               name,
+  //               description,
+  //               num_employees AS "numEmployees",
+  //               logo_url AS "logoUrl"
+  //        FROM companies
+  //        WHERE num_employees > $1
+  //        ORDER BY name`, [minEmployees] );
+  // return companiesRes.rows;
+  //   }

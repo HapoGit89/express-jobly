@@ -85,6 +85,159 @@ describe("findAll", function () {
       },
     ]);
   });
+  test("works: name filter", async function () {
+    let companies1 = await Company.findAll('c4', undefined, undefined);
+    let companies2 = await Company.findAll('c2', undefined, undefined)
+    let companies3 = await Company.findAll('c', undefined, undefined)
+    expect(companies1).toEqual([])
+    expect(companies2).toEqual([
+      
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      }
+    ]);
+    expect(companies3).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      },
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Desc3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img",
+      },
+    ]);
+  });
+
+  test("works: with filters", async function () {
+    let companies1 = await Company.findAll('c4', undefined, undefined);
+    let companies2 = await Company.findAll('c2', undefined, undefined)
+    let companies3 = await Company.findAll('c', undefined, undefined)
+    let companies4 = await Company.findAll(undefined, 2, undefined)
+    let companies5 = await Company.findAll(undefined, 1,2)
+    let companies6 = await Company.findAll('jakjsas', 1,2)
+    let companies7 = await Company.findAll('c1', 1,2)
+    let companies8 = await Company.findAll('c',undefined,2)
+    let companies9 = await Company.findAll(undefined,undefined,1)
+
+    expect(companies1).toEqual([])
+    expect(companies2).toEqual([
+      
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      }
+    ]);
+    expect(companies3).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      },
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Desc3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img",
+      },
+    ]);
+    expect(companies4).toEqual([
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Desc3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img",
+      },
+    ])
+    expect(companies5).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      },
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      }
+    ])
+    expect(companies6).toEqual([])
+    expect(companies7).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      }
+    ])
+    expect(companies8).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      },
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      }
+    ])
+    expect(companies9).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      }
+    ])
+  });
 });
 
 /************************************** get */

@@ -18,5 +18,50 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
     values: Object.values(dataToUpdate),
   };
 }
+// This function builds a query String and SQL parameter array from incoming filters
+function sqlFilters(name, minEmployees, maxEmployees) {
 
-module.exports = { sqlForPartialUpdate };
+    let baseQuery = `
+      SELECT handle,
+          name,
+          description,
+          num_employees AS "numEmployees",
+          logo_url AS "logoUrl"
+      FROM companies
+      `
+
+      const variables = []
+      let filterKeyword = "WHERE"
+      if(name) {
+        variables.push(`%${name.toLowerCase()}%`)
+        const nameQ = ` ${filterKeyword} lower (handle) LIKE $${variables.length}`
+        baseQuery += nameQ
+        filterKeyword = "AND"
+      }
+
+      if (minEmployees) {
+        variables.push(minEmployees-1)
+
+        const minQ = ` ${filterKeyword} num_employees > $${variables.length}`
+        baseQuery += minQ
+        filterKeyword = "AND"
+      }
+
+       if (maxEmployees) {
+        variables.push(maxEmployees+1)
+
+        const maxQ = ` ${filterKeyword} num_employees < $${variables.length}`
+        baseQuery += maxQ
+      }
+
+      baseQuery+= " ORDER BY name"
+
+
+      
+      return {baseQuery, variables}
+  }
+
+
+
+module.exports = { sqlForPartialUpdate,
+sqlFilters };

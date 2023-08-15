@@ -52,6 +52,14 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
   try {
+    // first validate whether there a additional, unwanted filters in request
+    const keys = Object.keys(req.query)
+    keys.forEach(element => {
+      if (element != 'name' && element != "minEmployees" && element != "maxEmployees"){
+        throw new ExpressError ("No additional filters allowed", 400)
+      }
+      
+    });
     const {name, minEmployees, maxEmployees} = req.query
     if ( minEmployees > maxEmployees){
       throw new ExpressError("minEmployees can't be > maxEmployees", 400)
