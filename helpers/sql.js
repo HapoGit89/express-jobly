@@ -40,17 +40,17 @@ function sqlFilters(name, minEmployees, maxEmployees) {
       }
 
       if (minEmployees) {
-        variables.push(minEmployees-1)
+        variables.push(minEmployees)
 
-        const minQ = ` ${filterKeyword} num_employees > $${variables.length}`
+        const minQ = ` ${filterKeyword} num_employees >= $${variables.length}`
         baseQuery += minQ
         filterKeyword = "AND"
       }
 
        if (maxEmployees) {
-        variables.push(maxEmployees+1)
+        variables.push(maxEmployees)
 
-        const maxQ = ` ${filterKeyword} num_employees < $${variables.length}`
+        const maxQ = ` ${filterKeyword} num_employees <= $${variables.length}`
         baseQuery += maxQ
       }
 

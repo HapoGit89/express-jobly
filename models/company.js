@@ -50,8 +50,9 @@ class Company {
    * */
 
   static async findAll(name, minEmployees, maxEmployees) {
+    
     const {baseQuery, variables} = sqlFilters(name, minEmployees, maxEmployees)
-  
+    console.log(baseQuery, variables)
     const companiesRes = await db.query(
       baseQuery, variables
           );

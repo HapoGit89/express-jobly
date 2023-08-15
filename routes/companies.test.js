@@ -97,8 +97,12 @@ describe("GET /companies", function () {
   });
 
   test("with filters", async function () {
-    const resp = await request(app).get("/companies").query({"name": "c1"});
-    expect(resp.body).toEqual({
+    const resp1 = await request(app).get("/companies").query({"name": "c1"});
+    const resp2 = await request(app).get("/companies").query({"name": "c1", "minEmployees": 3});
+    const resp3 = await request(app).get("/companies").query({"name": "c1", "minEmployees": 3, "lol": 23232});
+    const resp4 = await request(app).get("/companies").query({"maxEmployees": 2})
+    const resp5 = await request(app).get("/companies").query({"minEmployees": 200, "maxEmployees": 100})
+    expect(resp1.body).toEqual({
       companies:
           [
             {
@@ -110,6 +114,31 @@ describe("GET /companies", function () {
             }
           ],
     });
+    expect(resp2.body).toEqual({companies: []})
+    expect(resp3.status).toEqual(400)
+    expect(resp3.body.error.message).toEqual("No additional filters allowed")
+    expect(resp4.body).toEqual(
+      ({
+        companies:
+            [
+              {
+                handle: "c1",
+                name: "C1",
+                description: "Desc1",
+                numEmployees: 1,
+                logoUrl: "http://c1.img",
+              },
+              {
+                handle: "c2",
+                name: "C2",
+                description: "Desc2",
+                numEmployees: 2,
+                logoUrl: "http://c2.img",
+              },
+            ]}
+    ))
+    expect(resp5.status).toBe(400)
+    expect(resp5.body.error.message).toBe("minEmployees can't be > maxEmployees")
   });
 
   test("fails: test next() handler", async function () {
