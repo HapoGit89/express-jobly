@@ -7,7 +7,7 @@ const { sqlForPartialUpdate, sqlFilters } = require("../helpers/sql");
 /** Related functions for companies. */
 
 class Jobs {
-  /** Create a job (from data), update db, return new company data.
+  /** Create a job (from data), update db, return new job data.
    *
    * data should be { title, salary, equity, company_handle }
    *
@@ -16,12 +16,12 @@ class Jobs {
    
    * */
 
-  static async create({ title, salary, equity, company_handle}) {
+  static async create({ title, salary, equity, companyHandle}) {
     const duplicateCheck = await db.query(
           `SELECT title, company_handle
-           FROM companies
+           FROM jobs
            WHERE title = $1 AND company_handle = $2`,
-        [title,company_handle]);
+        [title,companyHandle]);
 
 
 
@@ -29,18 +29,18 @@ class Jobs {
       throw new BadRequestError(`Duplicate job : ${title} at company: ${company_handle}`);
 
     const result = await db.query(
-          `INSERT INTO jobbs
+          `INSERT INTO jobs
            (title, salary, equity, company_handle)
            VALUES ($1, $2, $3, $4,)
-           RETURNING title, salary, equity, company_handle AS "company_handle"`,
+           RETURNING title, salary, equity, company_handle AS "companyHandle"`,
         [
             title,
              salary,
               equity,
-               company_handle
+               companyHandle
         ],
     );
-    const jobb = result.rows[0];
+    const job = result.rows[0];
 
     return job;
   }
@@ -60,7 +60,7 @@ class Jobs {
     return jobsRes.rows;
   }
 
-  /** Given a company handle and title, return data about job.
+  /** Given a compannyHandle and job title, return data about job.
    *
    * Returns { title, salary, equity, company_handle }
    *   
@@ -71,12 +71,12 @@ class Jobs {
     const jobRes = await db.query(
           `SELECT title, salary, equity, company_handle AS companyHandle
            FROM jobs
-           WHERE title = $1 AND company_handle = %2`,
+           WHERE title = $1 AND company_handle = $2`,
         [title, companyHandle]);
 
     const job = jobRes.rows[0];
 
-    if (!job) throw new NotFoundError(`No company: ${handle}`);
+    if (!job) throw new NotFoundError(`No job: ${title} at company ${companyHandle}`);
 
     return job;
   }
@@ -105,7 +105,7 @@ class Jobs {
                       WHERE title = ${handleVarIdx} AND company_handle = ${handleVarIdx2}
                       RETURNING title, salary, equity, company_handle AS companyHandle `;
     const result = await db.query(querySql, [...values, title, companyHandle ]);
-    const jobbs = result.rows[0];
+    const job = result.rows[0];
 
     if (!job) throw new NotFoundError(`No job: ${title} at company ${company_handle}`);
 
@@ -134,102 +134,3 @@ class Jobs {
 module.exports = Jobs;
 
 
-
-
-
-// More code heavy way of filtering for findAll()
-//   if(name && !minEmployees && !maxEmployees){
-  //     const companiesRes = await db.query(
-  //       `SELECT handle,
-  //               name,
-  //               description,
-  //               num_employees AS "numEmployees",
-  //               logo_url AS "logoUrl"
-  //        FROM companies
-  //        WHERE lower (handle) LIKE $1
-  //        ORDER BY name`, [`%${name.toLowerCase()}%`] );
-  // return companiesRes.rows;
-  //   }
-
-  //   if(name && minEmployees && !maxEmployees){
-  //     const companiesRes = await db.query(
-  //       `SELECT handle,
-  //               name,
-  //               description,
-  //               num_employees AS "numEmployees",
-  //               logo_url AS "logoUrl"
-  //        FROM companies
-  //        WHERE lower (handle) LIKE $1
-  //        AND num_employees > $2
-  //        ORDER BY name`, [`%${name.toLowerCase()}%`, minEmployees] );
-  // return companiesRes.rows;
-  //   }
-
-  //   if(name && minEmployees && maxEmployees){
-  //     const companiesRes = await db.query(
-  //       `SELECT handle,
-  //               name,
-  //               description,
-  //               num_employees AS "numEmployees",
-  //               logo_url AS "logoUrl"
-  //        FROM companies
-  //        WHERE lower (handle) LIKE $1
-  //        AND num_employees > $2
-  //        AND num_employees < $3
-  //        ORDER BY name`, [`%${name.toLowerCase()}%`, minEmployees, maxEmployees] );
-  // return companiesRes.rows;
-  //   }
-
-  //   if(name && !minEmployees && maxEmployees){
-  //     const companiesRes = await db.query(
-  //       `SELECT handle,
-  //               name,
-  //               description,
-  //               num_employees AS "numEmployees",
-  //               logo_url AS "logoUrl"
-  //        FROM companies
-  //        WHERE lower (handle) LIKE $1
-  //        AND num_employees < $2
-  //        ORDER BY name`, [`%${name.toLowerCase()}%`, maxEmployees] );
-  // return companiesRes.rows;
-  //   } 
-
-  // if(!name && minEmployees && maxEmployees){
-  //     const companiesRes = await db.query(
-  //       `SELECT handle,
-  //               name,
-  //               description,
-  //               num_employees AS "numEmployees",
-  //               logo_url AS "logoUrl"
-  //        FROM companies
-  //        WHERE num_employees > $1
-  //        AND num_employees < $2
-  //        ORDER BY name`, [minEmployees, maxEmployees] );
-  // return companiesRes.rows;
-  //   }
-
-  //   if(!name && !minEmployees && maxEmployees){
-  //     const companiesRes = await db.query(
-  //       `SELECT handle,
-  //               name,
-  //               description,
-  //               num_employees AS "numEmployees",
-  //               logo_url AS "logoUrl"
-  //        FROM companies
-  //        WHERE num_employees < $1
-  //        ORDER BY name`, [maxEmployees] );
-  // return companiesRes.rows;
-  //   }
-
-  //   if(!name && minEmployees && !maxEmployees){
-  //     const companiesRes = await db.query(
-  //       `SELECT handle,
-  //               name,
-  //               description,
-  //               num_employees AS "numEmployees",
-  //               logo_url AS "logoUrl"
-  //        FROM companies
-  //        WHERE num_employees > $1
-  //        ORDER BY name`, [minEmployees] );
-  // return companiesRes.rows;
-  //   }
