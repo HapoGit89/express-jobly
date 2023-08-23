@@ -102,9 +102,9 @@ class Jobs {
 
     const querySql = `UPDATE jobs
                       SET ${setCols} 
-                      WHERE lower (title) = ${handleVarIdx} AND lower (company_handle) = ${handleVarIdx2}
+                      WHERE title= ${handleVarIdx} AND company_handle = ${handleVarIdx2}
                       RETURNING title, salary, equity, company_handle  `;
-    const result = await db.query(querySql, [...values, title.toLowerCase(), companyHandle.toLowerCase() ]);
+    const result = await db.query(querySql, [...values, title, companyHandle ]);
     const job = result.rows[0];
 
 
@@ -127,7 +127,7 @@ class Jobs {
         [title, company_handle]);
     const job = result.rows[0];
 
-    if (!job) throw new NotFoundError(`Not found job $${title} for company ${company_handle}`);
+    if (!job) throw new NotFoundError(`Not found job ${title} for company ${company_handle}`);
   }
 }
 

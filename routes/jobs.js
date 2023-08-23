@@ -11,6 +11,7 @@ const Jobs = require("../models/jobs");
 
 const jobNewSchema = require("../schemas/jobNew.json");
 const jobUpdateSchema = require("../schemas/jobUpdate.json");
+const { compare } = require("bcrypt");
 
 const router = new express.Router();
 
@@ -116,19 +117,22 @@ router.patch("/:title/:company_handle", ensureLoggedIn, ensureAdmin, async funct
   }
 });
 
-// /** DELETE /[handle]  =>  { deleted: handle }
-//  *
-//  * Authorization: login
-//  */
+/** DELETE /[title]/[company_handle]  =>  { deleted: title at company_handle}
+ *
+ * Authorization: Admin
+ */
 
-// router.delete("/:handle", ensureLoggedIn, async function (req, res, next) {
-//   try {
-//     await Company.remove(req.params.handle);
-//     return res.json({ deleted: req.params.handle });
-//   } catch (err) {
-//     return next(err);
-//   }
-// });
+router.delete("/:title/:company_handle", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
+  try {
+    await Jobs.remove(req.params.title, req.params.company_handle);
+    return res.json({ deleted: {
+        job: req.params.title,
+        company: req.params.company_handle
+    }});
+  } catch (err) {
+    return next(err);
+  }
+});
 
 
 module.exports = router;
