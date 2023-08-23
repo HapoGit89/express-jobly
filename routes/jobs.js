@@ -39,37 +39,37 @@ router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
   }
 });
 
-// /** GET /  =>
-//  *   { companies: [ { handle, name, description, numEmployees, logoUrl }, ...] }
-//  *
-//  * Can filter on provided search filters:
-//  * - minEmployees
-//  * - maxEmployees
-//  * - nameLike (will find case-insensitive, partial matches)
-//  *
-//  * Authorization required: none
-//  */
+/** GET /  =>
+ *   { companies: [ { handle, name, description, numEmployees, logoUrl }, ...] }
+ *
+ * Can filter on provided search filters:
+ * - minEmployees
+ * - maxEmployees
+ * - nameLike (will find case-insensitive, partial matches)
+ *
+ * Authorization required: none
+ */
 
-// router.get("/", async function (req, res, next) {
-//   try {
-//     // first validate whether there a additional, unwanted filters in request
-//     const keys = Object.keys(req.query)
-//     keys.forEach(element => {
-//       if (element != 'name' && element != "minEmployees" && element != "maxEmployees"){
-//         throw new ExpressError ("No additional filters allowed", 400)
-//       }
+router.get("/", async function (req, res, next) {
+  try {
+    // first validate whether there a additional, unwanted filters in request
+    // const keys = Object.keys(req.query)
+    // keys.forEach(element => {
+    //   if (element != 'name' && element != "minEmployees" && element != "maxEmployees"){
+    //     throw new ExpressError ("No additional filters allowed", 400)
+    //   }
 
-//     });
-//     const {name, minEmployees, maxEmployees} = req.query
-//     if ( minEmployees > maxEmployees){
-//       throw new ExpressError("minEmployees can't be > maxEmployees", 400)
-//     }
-//     const companies = await Company.findAll(name, minEmployees, maxEmployees);
-//     return res.json({ companies });
-//   } catch (err) {
-//     return next(err);
-//   }
-// });
+    // });
+    // const {name, minEmployees, maxEmployees} = req.query
+    // if ( minEmployees > maxEmployees){
+    //   throw new ExpressError("minEmployees can't be > maxEmployees", 400)
+    // }
+    const jobs = await Jobs.findAll();
+    return res.json({ jobs });
+  } catch (err) {
+    return next(err);
+  }
+});
 
 // /** GET /[handle]  =>  { company }
 //  *
