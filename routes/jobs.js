@@ -64,6 +64,8 @@ router.get("/", async function (req, res, next) {
     // if ( minEmployees > maxEmployees){
     //   throw new ExpressError("minEmployees can't be > maxEmployees", 400)
     // }
+
+    
     const jobs = await Jobs.findAll();
     return res.json({ jobs });
   } catch (err) {
@@ -71,48 +73,48 @@ router.get("/", async function (req, res, next) {
   }
 });
 
-// /** GET /[handle]  =>  { company }
+// /** GET /[title]/[company_handle]  =>  { job}
 //  *
-//  *  Company is { handle, name, description, numEmployees, logoUrl, jobs }
-//  *   where jobs is [{ id, title, salary, equity }, ...]
+//  *  Job is { title, salary, equity, company_handle }
+//  *   where title is [title] and company_handle is [company_handle]
 //  *
 //  * Authorization required: none
 //  */
 
-// router.get("/:handle", async function (req, res, next) {
-//   try {
-//     const company = await Company.get(req.params.handle);
-//     return res.json({ company });
-//   } catch (err) {
-//     return next(err);
-//   }
-// });
+router.get("/:title/:company_handle", async function (req, res, next) {
+  try {
+    const job = await Jobs.get(req.params.title, req.params.company_handle);
+    return res.json({ job });
+  } catch (err) {
+    return next(err);
+  }
+});
 
-// /** PATCH /[handle] { fld1, fld2, ... } => { company }
-//  *
-//  * Patches company data.
-//  *
-//  * fields can be: { name, description, numEmployees, logo_url }
-//  *
-//  * Returns { handle, name, description, numEmployees, logo_url }
-//  *
-//  * Authorization required: login
-//  */
+/** PATCH /[title]/[company_handle] { salary, equity, title } => { job }
+ *
+ * Patches job data.
+ *
+ * fields can be: { title, salary, equity}
+ *
+ * Returns { title, salary, equity, company_handle }
+ *
+ * Authorization required: Admin
+ */
 
-// router.patch("/:handle", ensureLoggedIn, async function (req, res, next) {
-//   try {
-//     const validator = jsonschema.validate(req.body, companyUpdateSchema);
-//     if (!validator.valid) {
-//       const errs = validator.errors.map(e => e.stack);
-//       throw new BadRequestError(errs);
-//     }
+router.patch("/:title/:company_handle", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
+  try {
+    const validator = jsonschema.validate(req.body, jobUpdateSchema);
+    if (!validator.valid) {
+      const errs = validator.errors.map(e => e.stack);
+      throw new BadRequestError(errs);
+    }
 
-//     const company = await Company.update(req.params.handle, req.body);
-//     return res.json({ company });
-//   } catch (err) {
-//     return next(err);
-//   }
-// });
+    const job = await Jobs.update(req.params.title, req.params.company_handle, req.body);
+    return res.json({ job });
+  } catch (err) {
+    return next(err);
+  }
+});
 
 // /** DELETE /[handle]  =>  { deleted: handle }
 //  *

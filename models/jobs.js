@@ -60,7 +60,7 @@ class Jobs {
     return jobsRes.rows;
   }
 
-  /** Given a compannyHandle and job title, return data about job.
+  /** Given a companyHandle and job title, return data about job.
    *
    * Returns { title, salary, equity, company_handle }
    *   
@@ -71,8 +71,8 @@ class Jobs {
     const jobRes = await db.query(
           `SELECT title, salary, equity, company_handle 
            FROM jobs
-           WHERE title = $1 AND company_handle = $2`,
-        [title, companyHandle]);
+           WHERE lower (title) = $1 AND lower (company_handle) = $2`,
+        [title.toLowerCase(), companyHandle.toLowerCase()]);
 
     const job = jobRes.rows[0];
 
@@ -102,9 +102,9 @@ class Jobs {
 
     const querySql = `UPDATE jobs
                       SET ${setCols} 
-                      WHERE title = ${handleVarIdx} AND company_handle = ${handleVarIdx2}
+                      WHERE lower (title) = ${handleVarIdx} AND lower (company_handle) = ${handleVarIdx2}
                       RETURNING title, salary, equity, company_handle  `;
-    const result = await db.query(querySql, [...values, title, companyHandle ]);
+    const result = await db.query(querySql, [...values, title.toLowerCase(), companyHandle.toLowerCase() ]);
     const job = result.rows[0];
 
 
