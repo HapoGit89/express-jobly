@@ -65,7 +65,6 @@ router.get("/", async function (req, res, next) {
     // if ( minEmployees > maxEmployees){
     //   throw new ExpressError("minEmployees can't be > maxEmployees", 400)
     // }
-
     
     const jobs = await Jobs.findAll();
     return res.json({ jobs });

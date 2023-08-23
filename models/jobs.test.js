@@ -245,7 +245,7 @@ describe("get", function () {
 
   test("not found if no such company", async function () {
     try {
-      await Jobs.get("nope");
+      await Jobs.get("nope", "nope");
       fail();
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();
