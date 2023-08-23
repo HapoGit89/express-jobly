@@ -69,7 +69,7 @@ class Jobs {
 
   static async get(title, companyHandle) {
     const jobRes = await db.query(
-          `SELECT title, salary, equity, company_handle AS companyHandle
+          `SELECT title, salary, equity, company_handle 
            FROM jobs
            WHERE title = $1 AND company_handle = $2`,
         [title, companyHandle]);
