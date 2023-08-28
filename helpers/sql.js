@@ -61,7 +61,55 @@ function sqlFilters(name, minEmployees, maxEmployees) {
       return {baseQuery, variables}
   }
 
+  function sqlFiltersJobs(title, minSalary, hasEquity) {
+
+    let baseQuery = `
+      SELECT title,
+          salary,
+          equity,
+          company_handle          
+      FROM jobs
+      `
+
+      const variables = []
+      let filterKeyword = "WHERE"
+      if(title) {
+        variables.push(`%${title.toLowerCase()}%`)
+        const titleQ = ` ${filterKeyword} lower (title) LIKE $${variables.length}`
+        baseQuery += titleQ
+        filterKeyword = "AND"
+      }
+
+      if (minSalary) {
+        variables.push(minSalary)
+        const SalaryQ = ` ${filterKeyword} salary >= $${variables.length}`
+        baseQuery += SalaryQ
+        filterKeyword = "AND"
+      }
+      if (hasEquity){
+        
+       if (hasEquity.toLowerCase()=="true") {
+        console.log("has equiktry")
+        const hasEquityQ = ` ${filterKeyword} equity > 0.00`
+        baseQuery += hasEquityQ
+        filterKeyword = "AND"
+      }
+
+      if (hasEquity.toLowerCase()=="false") {
+        const hasNoEquityQ = ` ${filterKeyword} equity <= 0.00`
+        baseQuery += hasNoEquityQ
+      }
+    }
+
+      baseQuery+= " ORDER BY title"
 
 
-module.exports = { sqlForPartialUpdate,
+      
+      return {baseQuery, variables}
+  }
+
+
+
+
+module.exports = { sqlForPartialUpdate, sqlFiltersJobs,
 sqlFilters };

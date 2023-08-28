@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate, sqlFilters } = require("../helpers/sql");
+const { sqlForPartialUpdate, sqlFilters, sqlFiltersJobs } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -50,14 +50,19 @@ class Jobs {
    * Returns [{ title, salary, equity, company_handle}, ...]
    * */
 
-  static async findAll() {
+  static async findAll(title, minSalary, hasEquity) {
     
-  
-
-    const jobsRes = await db.query(
-      'SELECT title, salary, equity, company_handle FROM jobs'
-          );
-    return jobsRes.rows;
+      const {baseQuery, variables} = sqlFiltersJobs(title, minSalary, hasEquity)
+      console.log(baseQuery, variables)
+      const jobRes = await db.query(
+        baseQuery, variables
+            );
+      return jobRes.rows;
+    
+    // const jobsRes = await db.query(
+    //   'SELECT title, salary, equity, company_handle FROM jobs'
+    //       );
+    // return jobsRes.rows;
   }
 
   /** Given a companyHandle and job title, return data about job.
