@@ -86,6 +86,21 @@ class Jobs {
     return job;
   }
 
+
+  static async getForCompany(companyHandle) {
+    const jobRes = await db.query(
+          `SELECT title, salary, equity, company_handle 
+           FROM jobs
+           WHERE lower (company_handle) = $1`,
+        [companyHandle.toLowerCase()]);
+
+    const jobs = jobRes.rows;
+
+    if (!jobs) throw new NotFoundError(`No job at company ${companyHandle}`);
+
+    return jobs;
+  }
+
   /** Update job data with `data`.
    *
    * This is a "partial update" --- it's fine if data doesn't contain all the
