@@ -41,12 +41,12 @@ router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
 });
 
 /** GET /  =>
- *   { companies: [ { handle, name, description, numEmployees, logoUrl }, ...] }
+ *   { jobs: [ { title, salary, equiy, company_handle}, ...] }
  *
  * Can filter on provided search filters:
- * - minEmployees
- * - maxEmployees
- * - nameLike (will find case-insensitive, partial matches)
+ * - minSalary
+ * - hasEquity
+ * - title (will find case-insensitive, partial matches)
  *
  * Authorization required: none
  */

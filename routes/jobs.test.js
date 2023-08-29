@@ -113,50 +113,80 @@ describe("GET /jobs", function () {
     });
   });
 
-//   test("with filters", async function () {
-//     const resp1 = await request(app).get("/companies").query({"name": "c1"});
-//     const resp2 = await request(app).get("/companies").query({"name": "c1", "minEmployees": 3});
-//     const resp3 = await request(app).get("/companies").query({"name": "c1", "minEmployees": 3, "lol": 23232});
-//     const resp4 = await request(app).get("/companies").query({"maxEmployees": 2})
-//     const resp5 = await request(app).get("/companies").query({"minEmployees": 200, "maxEmployees": 100})
-//     expect(resp1.body).toEqual({
-//       companies:
-//           [
-//             {
-//               handle: "c1",
-//               name: "C1",
-//               description: "Desc1",
-//               numEmployees: 1,
-//               logoUrl: "http://c1.img",
-//             }
-//           ],
-//     });
-//     expect(resp2.body).toEqual({companies: []})
-//     expect(resp3.status).toEqual(400)
-//     expect(resp3.body.error.message).toEqual("No additional filters allowed")
-//     expect(resp4.body).toEqual(
-//       ({
-//         companies:
-//             [
-//               {
-//                 handle: "c1",
-//                 name: "C1",
-//                 description: "Desc1",
-//                 numEmployees: 1,
-//                 logoUrl: "http://c1.img",
-//               },
-//               {
-//                 handle: "c2",
-//                 name: "C2",
-//                 description: "Desc2",
-//                 numEmployees: 2,
-//                 logoUrl: "http://c2.img",
-//               },
-//             ]}
-//     ))
-//     expect(resp5.status).toBe(400)
-//     expect(resp5.body.error.message).toBe("minEmployees can't be > maxEmployees")
-//   });
+  test("with filters", async function () {
+    const resp1 = await request(app).get("/jobs").query({"title": "1"});
+    const resp2 = await request(app).get("/jobs").query({"title": "J1", "minSalary": 100000});
+    const resp3 = await request(app).get("/jobs").query({"title": "j1", "minSalary": 1000, "lol": 23232});
+    const resp4 = await request(app).get("/jobs").query({"hasEquity": true})
+    const resp5 = await request(app).get("/jobs").query({"hasEquity": false})
+    const resp6 = await request(app).get("/jobs").query({"minSalary": 44000, "title": "j"})
+    expect(resp1.body).toEqual({
+      jobs:
+          [
+            {
+              title: "j1",
+              salary: 45000,
+              equity: "0.78",
+              company_handle: "c1",
+            }
+          ],
+    });
+    expect(resp2.body).toEqual({jobs: []})
+    expect(resp3.status).toEqual(400)
+    expect(resp3.body.error.message).toEqual("No additional filters allowed")
+    expect(resp4.body).toEqual(
+      ({
+                jobs:
+                    [
+                      {
+                        title: "j1",
+                        salary: 45000,
+                        equity: "0.78",
+                        company_handle: "c1"
+                      },
+                  
+                      {
+                        title: "j2",
+                        salary: 47000,
+                        equity: "0.78",
+                        company_handle: "c2"
+                      },
+                 
+                      {
+                        title: "j3",
+                        salary: 40000,
+                        equity: "0.58",
+                        company_handle: "c3"
+                      }
+                    ],
+              }
+            
+    ))
+    expect(resp5.body).toEqual({jobs: []})
+   expect(resp6.body).toEqual(
+    ({
+              jobs:
+                  [
+                    {
+                      title: "j1",
+                      salary: 45000,
+                      equity: "0.78",
+                      company_handle: "c1"
+                    },
+                
+                    {
+                      title: "j2",
+                      salary: 47000,
+                      equity: "0.78",
+                      company_handle: "c2"
+                    },
+               
+                   
+                  ],
+            }
+          
+  ))
+  });
 
   test("fails: test next() handler", async function () {
     // there's no normal failure event which will cause this route to fail ---
