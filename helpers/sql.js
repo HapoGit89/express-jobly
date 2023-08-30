@@ -18,7 +18,7 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
     values: Object.values(dataToUpdate),
   };
 }
-// This function builds a query String and SQL parameter array from incoming filters
+// This function builds a query String and SQL parameter array from incoming filters for the companies table
 function sqlFilters(name, minEmployees, maxEmployees) {
 
     let baseQuery = `
@@ -61,6 +61,8 @@ function sqlFilters(name, minEmployees, maxEmployees) {
       return {baseQuery, variables}
   }
 
+
+  // This function builds a query String and SQL parameter array from incoming filters for the jobs table
   function sqlFiltersJobs(title, minSalary, hasEquity) {
 
     let baseQuery = `
@@ -87,7 +89,7 @@ function sqlFilters(name, minEmployees, maxEmployees) {
         filterKeyword = "AND"
       }
       if (hasEquity){
-        
+
        if (hasEquity.toLowerCase()=="true") {
         console.log("has equiktry")
         const hasEquityQ = ` ${filterKeyword} equity > 0.00`

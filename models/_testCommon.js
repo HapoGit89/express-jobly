@@ -21,9 +21,9 @@ async function commonBeforeAll() {
 
 
            
-  await db.query(`INSERT INTO jobs(title, salary, equity, company_handle) 
+  const jobs = await db.query(`INSERT INTO jobs(title, salary, equity, company_handle) 
                 VALUES ('job1',30000, 0.5, 'c1'),
-                ('job2', 30000, 0.9, 'c2')`);
+                ('job2', 30000, 0.9, 'c2') RETURNING id`);
 
 
   await db.query(`
@@ -39,6 +39,10 @@ async function commonBeforeAll() {
         await bcrypt.hash("password1", BCRYPT_WORK_FACTOR),
         await bcrypt.hash("password2", BCRYPT_WORK_FACTOR),
       ]);
+      id = jobs.rows[0].id
+    await db.query(`INSERT INTO applications (username, job_id) VALUES ('u1',$1)`, [id])
+
+    
 }
 
 async function commonBeforeEach() {

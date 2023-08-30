@@ -6,8 +6,9 @@ const jsonschema = require("jsonschema");
 
 const express = require("express");
 const { ensureLoggedIn, authenticateJWT, ensureAdmin } = require("../middleware/auth");
-const { BadRequestError, UnauthorizedError } = require("../expressError");
+const { BadRequestError, UnauthorizedError, NotFoundError } = require("../expressError");
 const User = require("../models/user");
+const Job = require("../models/jobs")
 const { createToken } = require("../helpers/tokens");
 const userNewSchema = require("../schemas/userNew.json");
 const userUpdateSchema = require("../schemas/userUpdate.json");
@@ -42,6 +43,28 @@ router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
     return next(err);
   }
 });
+
+// POST => { username, jobId} 
+// returns application object if succesful or throws notfoundError if job or user not found
+router.post("/:username/jobs/:jobid", ensureLoggedIn, async function (req, res, next) {
+  try {
+    if (req.params.username != res.locals.user.username && !res.locals.user.isAdmin){
+      throw new UnauthorizedError
+    }
+    const username = req.params.username
+    const jobId = req.params.jobid
+    const user = await User.get(username)
+    const job = await Job.getbyId(jobId)
+    if (!user || !job){
+      throw new NotFoundError(`JobId or username unkmnown`)
+    }
+    const application = await User.applyforJob(jobId, username);
+    return res.status(201).json({ applied: jobId});
+  } catch (err) {
+    return next(err);
+  }
+});
+
 
 
 /** GET / => { users: [ {username, firstName, lastName, email }, ... ] }

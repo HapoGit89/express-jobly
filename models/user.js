@@ -114,11 +114,16 @@ class User {
 
     return result.rows;
   }
+ // given a username and JobId inserts into the applications table
+  static async applyforJob(jobId, username){
+    const result = await db.query(`INSERT INTO applications (username, job_id) VALUES ($1, $2) RETURNING username, job_id`, [username, jobId])
+    return result.rows[0]
+  }
 
   /** Given a username, return data about user.
    *
    * Returns { username, first_name, last_name, is_admin, jobs }
-   *   where jobs is { id, title, company_handle, company_name, state }
+   *   where jobs is [JobId, JobId, ...]
    *
    * Throws NotFoundError if user not found.
    **/
@@ -138,6 +143,12 @@ class User {
     const user = userRes.rows[0];
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
+    
+    user.jobs = []
+
+    const jobRes = await db.query(`SELECT job_id FROM applications WHERE username = $1`, [username])
+
+    jobRes.rows.forEach(e => user.jobs.push(e.job_id))
 
     return user;
   }
