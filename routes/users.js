@@ -61,6 +61,7 @@ router.post("/:username/jobs/:jobid", ensureLoggedIn, async function (req, res, 
     const application = await User.applyforJob(jobId, username);
     return res.status(201).json({ applied: jobId});
   } catch (err) {
+    console.log(err)
     return next(err);
   }
 });

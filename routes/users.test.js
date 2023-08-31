@@ -133,9 +133,8 @@ describe("POST /users", function () {
 describe("POST /users/:username/jobs/:jobId", function () {
   test("works for admins", async function () {
     const jobs = await db.query('SELECT id FROM jobs')
-    console.log(jobs.rows[0].id)
+    // console.log(jobs.rows[0].id)
     const id = jobs.rows[0].id
-    console.log(`/users/u2/jobs/${id}`)
     const resp = await request(app)
         .post(`/users/u3/jobs/${id}`)
         .set("authorization", `Bearer ${u2Token}`);
@@ -220,7 +219,7 @@ describe("GET /users/:username", function () {
         lastName: "U3L",
         email: "user3@user.com",
         isAdmin: false,
-        jobs: [expect.any(Number)]
+        jobs: []
       },
     });
   });
